@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">Musin</div>
+        <!-- Logout Button -->
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </header>
+
+    <!-- Language Tabs -->
+<div class="tabs">
+    <button class="tab-button" onclick="showSongs('english')">English</button>
+    <button class="tab-button" onclick="showSongs('hindi')">Hindi</button>
+    
+</div>
+
+
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search song..." oninput="searchSongs()">
+    </div>
+
+    <!-- Song List Section -->
+    <section id="songs-list" class="songs-list">
+        <h2>Song List</h2>
+        <div id="song-container" class="song-container">
+            <!-- Songs will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- Music Player (hidden initially) -->
+    <div id="music-player" class="music-player">
+        <div class="player-info">
+            <p id="song-title">No song playing</p>
+            <p id="song-duration">0:00 / 0:00</p>
+        </div>
+        <div class="player-controls">
+            <button id="play-pause-button" onclick="togglePlay()">&#9658;</button>
+            <input type="range" id="seek-bar" value="0" max="100" onchange="seekSong()" />
+        </div>
+        <div class="player-options">
+            <label for="audio-source">Select Source:</label>
+            <select id="audio-source" onchange="changeSource()">
+                <option value="default">From Beginning</option>
+                <option value="current">From Current Position</option>
+            </select>
+            <button class="close-button" onclick="closePlayer()">&#10005;</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Musin. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
