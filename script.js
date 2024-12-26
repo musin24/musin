@@ -45,7 +45,8 @@ let isPlaying = false;
 let audio = new Audio();
 let songDuration = 0;
 let seekBar = document.getElementById('seek-bar');
-
+let currentLanguage = 'english'; // Default language
+let currentIndex = 0; // Track the current song index
 
 // Function to generate songs based on selected language
 function generateSongs(language, searchQuery = '') {
@@ -83,32 +84,48 @@ function closePlayer() {
 
 // Function to play the selected song
 function playSong(index, language) {
-  const song = songs[language][index];
+    const song = songs[language][index];
 
-  if (currentSong !== song.path) {
-      currentSong = song.path;
-      audio.src = song.path;
-      audio.play();
-      isPlaying = true;
+    if (currentSong !== song.path) {
+        currentSong = song.path;
+        currentIndex = index; // Update the current index
+        currentLanguage = language; // Update the current language
+        audio.src = song.path;
+        audio.play();
+        isPlaying = true;
 
-      // Show the music player and update song details
-      document.getElementById("music-player").style.display = "block";
-      document.getElementById("song-title").textContent = song.name;
-      
-      // Set the total duration
-      audio.onloadedmetadata = function() {
-          songDuration = audio.duration;
-          updateDuration();
-      };
+        // Show the music player and update song details
+        document.getElementById("music-player").style.display = "block";
+        document.getElementById("song-title").textContent = song.name;
 
-      // Update the seek bar as the song plays
-      audio.ontimeupdate = function() {
-          seekBar.value = (audio.currentTime / songDuration) * 100;
-          updateDuration();
-      };
-  } else {
-      togglePlay();
-  }
+        // Set the total duration
+        audio.onloadedmetadata = function() {
+            songDuration = audio.duration;
+            updateDuration();
+        };
+
+        // Update the seek bar as the song plays
+        audio.ontimeupdate = function() {
+            seekBar.value = (audio.currentTime / songDuration) * 100;
+            updateDuration();
+        };
+
+        // Automatically play the next song when the current song ends
+        audio.onended = function() {
+            playNextSong();
+        };
+    } else {
+        togglePlay();
+    }
+}
+
+// Function to play the next song in the playlist
+function playNextSong() {
+    currentIndex++;
+    if (currentIndex >= songs[currentLanguage].length) {
+        currentIndex = 0; // Loop back to the first song
+    }
+    playSong(currentIndex, currentLanguage);
 }
 
 // Toggle play/pause
@@ -154,14 +171,16 @@ function changeSource() {
 
 // Show songs based on selected language tab
 function showSongs(language) {
-  generateSongs(language);
+    currentLanguage = language; // Update the current language
+    currentIndex = 0; // Reset the song index when switching languages
+    generateSongs(language);
 
-  // Remove active class from all tabs
-  const tabs = document.querySelectorAll('.tab-button');
-  tabs.forEach(tab => tab.classList.remove('active'));
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(tab => tab.classList.remove('active'));
 
-  // Add active class to the selected tab
-  document.querySelector(`.tab-button[onclick="showSongs('${language}')"]`).classList.add('active');
+    // Add active class to the selected tab
+    document.querySelector(`.tab-button[onclick="showSongs('${language}')"]`).classList.add('active');
 }
 
 // Search songs as the user types
