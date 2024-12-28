@@ -193,6 +193,7 @@ function searchSongs() {
 }
 
 
+
 // Initialize with English songs
 showSongs('english');  
 
@@ -214,19 +215,32 @@ window.onload = function() {
   if (!sessionStorage.getItem('userLoggedIn')) {
     // If no user is logged in, redirect to the login page
     window.location.href = 'signin.html';
+  } else {
+    firebase.auth().onAuthStateChanged(async function(user) {
+      if (user) {
+        try {
+          // Check if the user still exists in Firebase
+          const userDoc = await firebase.firestore().collection("users").doc(user.uid).get();
+          
+          if (userDoc.exists) {
+            // User exists, allow access
+            sessionStorage.setItem('userLoggedIn', true);
+          } else {
+            // User does not exist in Firebase, log them out
+            firebase.auth().signOut();
+            sessionStorage.removeItem('userLoggedIn');
+            alert("Your account has been removed. Please sign up again.");
+            window.location.href = 'signin.html';
+          }
+        } catch (error) {
+          console.error("Error checking user existence:", error);
+          alert("An error occurred. Please try again later.");
+        }
+      } else {
+        // No user is signed in, redirect to login
+        sessionStorage.removeItem('userLoggedIn');
+        window.location.href = 'signin.html';
+      }
+    });
   }
 };
-
-// After successful sign-in, set the login state in sessionStorage and redirect
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // If user is signed in, set session storage to indicate login
-    sessionStorage.setItem('userLoggedIn', true);
-    
-    // Redirect to homepage after sign-in
-    window.location.href = "index.html"; // Change to your homepage URL
-  } else {
-    // If no user is signed in, ensure sessionStorage is cleared
-    sessionStorage.removeItem('userLoggedIn');
-  }
-});
